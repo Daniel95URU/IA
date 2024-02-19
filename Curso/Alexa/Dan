@@ -1,0 +1,150 @@
+import speech_recognition as sr
+import pyttsx3
+import pywhatkit
+import datetime
+import wikipedia
+import pyjokes
+import webbrowser
+#import spotipy (No funciona correctamente)
+
+# def Prueba():
+#     print('''       
+#                       _____                    
+#                       |  __ \                
+#                       | |  | |  / _` | | '_ \  
+#                       | |__| | | (_| | | | | | 
+#                       |      | |   | |   __  _ 
+#                       |_____/   \__,_| |_| |_| 
+                                        
+                                                  
+#                                                                              ''')
+    
+
+listener = sr.Recognizer()      #Listener (API de reconocimiento de voz en inglés)
+motor = pyttsx3.init()          #Motor Text-To-Speech
+voices = motor.getProperty('voices')    #Propiedades de las voces segun el TTSX3
+motor.setProperty('voice', voices[0].id)    #Tipo de voz (Usada en windows 10 (voz de Cortana))
+motor.setProperty('rate', 150)              # Tasa (palabras por sec)
+
+def talk(text):
+    motor.say(text)
+    motor.runAndWait()
+
+def comandos(): 
+    global comando  
+    try:
+        with sr.Microphone() as source:
+            print('escuchando!')
+            voice = listener.listen(source)
+            comando = listener.recognize_google(voice)
+            comando = comando.lower()
+            if 'dan' in comando:
+                comando = comando.replace('dan', '')
+        
+    except sr.RequestError:
+        print('Servidor de speech_recognition caído')
+        talk('Sorry, my speech service is down')
+
+    except:
+        pass
+
+    return comando
+
+def run_dan(): #Todos los comandos posibles con "Dan"
+    comando = comandos()
+    print('Comandos usados: ', comando)
+
+    if 'play' in comando:
+        video = comando.replace('play', '')
+        talk('Playing' + video)
+        print('reproducir' + video)
+        pywhatkit.playonyt(video) #Funciones de whatkit para reproducción en YouTube
+
+    elif 'search' in comando:
+        busqueda = comando.replace('search', '')
+        url = 'https://google.com/search?q=' + busqueda
+        webbrowser.get().open(url)          #Funciones de WEBBROWSER API para abrir navegador y realizar búsqueda.
+        print('BUSQUEDA: ' + busqueda)
+        talk('Here it is ' + busqueda)
+    
+    # elif 'spotify' in comando:
+    #    musica = comando.replace('spotify', '')
+    #    test_album_urn(self):
+    #    album = self.spotify.album(self.pinkerton_urn)
+    #    self.assertTrue(album['name'] == 'Pinkerton') 
+
+    elif 'map' in comando:
+        localizacion = comando.replace('map', '')
+        url = 'https://google.nl/maps/place/' + localizacion + '/&amp;'
+        webbrowser.get().open(url)
+        print('MAPA ' + localizacion)
+        talk('Here is the map of ' + localizacion)
+
+    elif 'university' in comando:
+        uru = comando.replace('university', '')
+        url = 'http://uru.insiemp.com/educa/'
+        webbrowser.get().open(url)
+        print('Imprime ' + uru)
+        talk('Here is the webpage of URU ' + uru)
+
+    elif 'time' in comando:
+        time = datetime.datetime.now().strftime('%I:%m %p')
+        print(time + ' Tiempo de vals')
+        talk('Current time is ' + time)
+
+    elif 'tell me about' in comando:
+        pregunta = comando.replace('tell me about', '')
+        info = wikipedia.summary(pregunta, 2)
+        print(info)
+        talk(info)
+
+    elif 'how are you' in comando:
+        talk('I\'m fine. How about you?')
+
+    elif 'what are you doing' in comando:
+        talk('I\'m watching you')
+
+    elif 'joke' in comando:
+        bromita = pyjokes.get_joke()
+        print(bromita)
+        talk(bromita)
+
+        ### PRUEBAS DE FUNCIONAMIENTO ###
+
+    elif 'who are you' in comando:
+        talk('I\'m Dan. Your 24/7 virtual assistant.')
+
+    elif 'thank you' in comando:
+        talk('Your welcome. Anything else you want me to do?')
+
+    elif 'good bye' in comando:
+        talk('Bye!')
+
+    elif 'exit' in comando:
+        exit()
+
+    else:
+        print('ERROR, repite repite repite')
+        talk('Sorry, I didn\'t get that')
+
+while True:     
+    run_dan()
+
+
+# def main():
+#     Prueba()
+#     i=0
+#     while i>=0:
+#         if i==0:
+#             captura('hi i\'m virtual dan, what you wanna do?  ')   
+#         elif i>1:
+#             captura('Any other thing you want to do?')
+        
+#         comando=run_dan()
+#         i+=1
+            
+#         if 'end this' in comando:
+#             captura('Finishing bro.')
+#             break
+
+# main()        FALLO
